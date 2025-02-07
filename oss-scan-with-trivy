@@ -3,7 +3,21 @@
 2. Trivy installation :
 
 ---INSTALLATION STEPS---
+Step1:
+------------
 
+# Download the Trivy Debian package
+wget https://github.com/aquasecurity/trivy/releases/download/v0.45.0/trivy_0.45.0_Linux-64bit.deb
+
+# Install the downloaded package
+sudo dpkg -i trivy_0.45.0_Linux-64bit.deb
+
+# Fix any missing dependencies
+sudo apt-get install -f
+
+
+Step2:
+------------
 sudo apt-get install wget apt-transport-https gnupg lsb-release
 
 wget -qO - https://aquasecurity.github.io/trivy-repo/deb/public.key | gpg --dearmor | sudo tee /usr/share/keyrings/trivy.gpg > /dev/null
@@ -14,27 +28,84 @@ sudo apt-get update
 
 sudo apt-get install trivy
 
+...........
+
+trivy -version
+
+e,.g:
+
+trivy -v
+Version: 0.59.1
+Vulnerability DB:
+Version: 2
+UpdatedAt: 2025-02-07 06:15:29.586609055 +0000 UTC
+NextUpdate: 2025-02-08 06:15:29.586608785 +0000 UTC
+DownloadedAt: 2025-02-07 07:39:27.822191859 +0000 UTC
+Java DB:
+Version: 1
+UpdatedAt: 2025-02-07 02:51:31.909229592 +0000 UTC
+NextUpdate: 2025-02-10 02:51:31.909229472 +0000 UTC
+DownloadedAt: 2025-02-07 07:40:29.85871926 +0000 UTC
+Check Bundle:
+Digest: sha256:ac89e7d82ab5feeabc055a454066bc182f9248e96b8ecb1ca5810cd59c659800
+DownloadedAt: 2025-02-07 08:12:38.257335665 +0000 UTC
+
+
 ---COMMANDS---
 
-trivy image imagename
+Docker image scan :
 
-trivy fs --security-checks vuln,config   Folder_name_OR_Path
+trivy image imagename
 
 trivy image --severity HIGH,CRITICAL image_name
 
 trivy image -f json -o results.json image_name
 
+File Systems :
+
+trivy fs --security-checks vuln,config   Folder_name_OR_Path
+
+GIT REPO :
+trivy repo --format table https://github.com/bharathikalai/Docker
+
 trivy repo repo-url
 
+IaC Files:
+trivy config -f terraform /path/to/terraform/files
+trivy config -f cloudformation /path/to/terraform/files
+
+Dependency Files:
+trivy fs --vuln-type=os,library --format json -o report.json /path/to/requirements.txt
+
+
+K8s yaml files:
+
 trivy k8s --report summary cluster
+trivy config -f kubernetes /path/to/kubernetes/manifests
+
+
+Trivy Jenkins command:
+trivy --no-progress --exit-code 1 --severity HIGH,CRITICAL your_docker_image
+
+AWS:
+# Scan your AWS AMI
+$ trivy aws --service ec2
+
+$ trivy aws --format json --output report.json 
+
+$ trivy vm --scanners vuln ami:ami-022ce6f32988af5fa
+
+# Scan your AWS EBS snapshot
+$ trivy vm ebs:${your_ebs_snapshot_id}
+
 
 ......
 
 On Conatiner image
-    File System
-    Git repo
-    Kubernetes
-    AWS 
+File System
+Git repo
+Kubernetes
+AWS 
 
 OS packages and software dependencies 
 Known vulnerabilities (CVE's)
@@ -46,13 +117,13 @@ IaC issues and misconigurations
 trivy image nginx
 
 o/p:
-    nginx (debian 12.9)
-    Total: 148 (UNKNOWN: 1, LOW: 99, MEDIUM: 35, HIGH: 11, CRITICAL: 2)
+nginx (debian 12.9)
+Total: 148 (UNKNOWN: 1, LOW: 99, MEDIUM: 35, HIGH: 11, CRITICAL: 2)
 
 
 
 trivy image --severity HIGH,CRITICAL nginx
 
- git clone https://github.com/bkumar2018/kubernetes_learn.git
- 
- trivy fs --security-checks vuln,config kubernetes_learn/ -o results.log
+git clone https://github.com/bkumar2018/kubernetes_learn.git
+
+trivy fs --security-checks vuln,config kubernetes_learn/ -o results.log
